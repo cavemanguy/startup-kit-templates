@@ -8,6 +8,7 @@ This repo contains a collection of AWS [CloudFormation](https://docs.aws.amazon.
 - A container-based environment using [Amazon Fargate](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ECS_GetStarted.html)
 - A relational database using [Amazon RDS](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html)
 - An [Amazon Aurora](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Aurora.html) DB cluster
+- An [ElastiCache Cluster](https://docs.aws.amazon.com/AmazonElastiCache/latest/UserGuide/WhatIs.html)
 - [Billing alerts](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/monitor_estimated_charges_with_cloudwatch.html) for your account
 
 The VPC template is a requirement for the others. You can either run the templates/vpc.cfn.yml template by itself prior to using the others, or run any one of the vpc-*.cfn.yml wrapper templates at the top level of this repo to create sets of resources. For example, vpc-bastion-fargate-rds.cfn.yml will create a single stack containing a vpc, bastion host, fargate cluster, and database.
@@ -38,6 +39,7 @@ Each section contains details about template parameters and the resources create
 - [fargate.cfn.yml](#fargate)
 - [db.cfn.yml](#db)
 - [aurora.cfn.yml](#aurora)
+- [elasticache.cfn.yml](#elasticache)
 - [billing.cfn.yml](#billing)
 
 
@@ -102,6 +104,7 @@ The **_elastic-beanstalk.cfn.yml_** template asks for a series of inputs definin
 
 - A stack type, with allowed values of node, rails, python, python3 or spring.
 - An environment name with allowed values  of dev or prod.
+- The name of the stack you previously created to define your VPC, as the NetworkStackName parameter.
 
 It creates:
 
@@ -117,6 +120,8 @@ It creates:
 ### Fargate
 
 [AWS Fargate](https://aws.amazon.com/fargate/) is part of [Amazon Elastic Container Service (ECS)](https://aws.amazon.com/ecs/). It's a managed service for running container-based applications, without having to worry about the underlying servers--sort of like [Lambda](https://aws.amazon.com/lambda/) for containers.
+
+Creating a Fargate stack requires you to have first created a [VPC](#vpc) stack, and to enter the name of the VPC stack as the NetworkStackName parameter.
 
 The **_fargate.cfn.yml_** template creates:
 
@@ -137,6 +142,8 @@ The **_fargate.cfn.yml_** template creates:
 
 [Amazon Relational Database Service (RDS)](https://aws.amazon.com/rds/) is a service for running relational databases without having to manage the server software, backups, or other maintenance tasks. The RDS service as a whole supports Amazon Aurora, PostgreSQL, MySQL, MariaDB, Oracle, and Microsoft SQL Server; this template currently works with PostgreSQL, MySQL, and MariaDB, and supports t2, m4, and r4 [instance types](https://aws.amazon.com/rds/instance-types/).
 
+Creating an RDS stack requires you to have first created a [VPC](#vpc) stack, and to enter the name of the VPC stack as the NetworkStackName parameter.
+
 The **_db.cfn.yml_** template creates:
 
 - A DB instance
@@ -148,11 +155,27 @@ The **_db.cfn.yml_** template creates:
 
 Amazon Aurora is a high-performance cloud-optimized relational database, which is compatible with MySQL and PostgreSQL. It’s treated separately than RDS because Aurora has a few unique characteristics.
 
+Creating an Aurora stack requires you to have first created a [VPC](#vpc) stack, and to enter the name of the VPC stack as the NetworkStackName parameter.
+
 The **_aurora.cfn.yml_** template creates:
 
 - An [Aurora DB Cluster](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Aurora.CreateInstance.html)
 - An [Aurora DB instance](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Aurora.html)
 - A DB subnet group
+
+
+<a href="elasticache"></a>
+### ElastiCache Cluster
+
+Amazon ElastiCache is a managed high-performance in-memory data store, backed with either the Redis or Memcached engines. Running this template lets you select the engine type, number of nodes in the cluser, and the instance type of the nodes.
+
+Creating an ElastiCache stack requires you to have first created a [VPC](#vpc) stack, and to enter the name of the VPC stack as the NetworkStackName parameter.
+
+The **_elasticache.cfn.yml_** template creates:
+
+- An [ElastiCache Cluster](https://docs.aws.amazon.com/AmazonElastiCache/latest/UserGuide/WhatIs.html)
+- An ElastiCache subnet group
+- An ElastiCache security group
 
 
 <a href="billing"></a>
